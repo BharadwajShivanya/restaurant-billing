@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Billing System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <h1>Restaurant Billing System</h1>
+    </header>
+
+    <!-- Menu Section -->
+    <section class="menu">
+        <h2>Menu</h2>
+        <div id="menu-items">
+            <!-- Menu items will be loaded dynamically -->
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section class="cart">
+        <h2>Cart</h2>
+        <div id="cart-items"></div>
+        <h3>Total: ₹<span id="total">0</span></h3>
+        <button onclick="showBilling()">Proceed to Billing</button>
+    </section>
+
+    <!-- Billing Section -->
+    <section class="billing" id="billing-section">
+        <h2>Billing</h2>
+        <label>Discount (₹): </label>
+        <input type="number" id="discount" value="0" oninput="updateTotal()">
+        <h3>Tax (5%): ₹<span id="tax">0</span></h3>
+        <h3>Final Total: ₹<span id="final-total">0</span></h3>
+        <button onclick="generateReceipt()">Generate Receipt</button>
+    </section>
+
+    <!-- Receipt Section -->
+    <section class="receipt" id="receipt-section">
+        <h2>Receipt</h2>
+        <div id="receipt-details"></div>
+        <button onclick="printReceipt()">Print Receipt</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
