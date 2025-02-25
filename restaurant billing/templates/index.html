@@ -1,117 +1,532 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Billing System</title>
-    <link href='./style.css' rel='stylesheet'>
-    <script src='./script.js' defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurant Billing System</title>
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    .header {
+      background-color: #1a1a1a;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .header button#toggleAddItemBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .menu-section,
+    .bill-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .menu-category {
+      margin-bottom: 30px;
+    }
+    .category-title {
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    .menu-item {
+      background-color: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .menu-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .menu-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    .menu-item h4 {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .menu-item p {
+      color: #666;
+      font-weight: bold;
+    }
+    /* Bill Section */
+    .bill-title {
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .bill-items {
+      margin-bottom: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .bill-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 10px;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      align-items: center;
+    }
+    .quantity-controls {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .quantity-btn {
+      background-color: #e0e0e0;
+      border: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: bold;
+      color: #333;
+    }
+    .remove-item {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .bill-summary {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #e0e0e0;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .total-row {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 2px solid #e0e0e0;
+    }
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .action-btn {
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .submit-btn {
+      background-color: #007bff;
+      color: white;
+    }
+    .print-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .clear-btn {
+      background-color: #ff4444;
+      color: white;
+    }
+    /* Modal for Add Menu Item Form */
+    .modal {
+      display: none; /* hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal-content h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .modal-content button {
+      padding: 10px;
+      width: 48%;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-content .save-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .modal-content .cancel-btn {
+      background-color: #ff4444;
+      color: white;
+    }
+    /* Print Styles */
+    @media print {
+      body {
+        padding: 0;
+        background-color: white;
+      }
+      .header {
+        background-color: white;
+        color: black;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #333;
+        border-radius: 0;
+      }
+      .container {
+        display: block;
+      }
+      .menu-section,
+      #toggleAddItemBtn,
+      .modal {
+        display: none;
+      }
+      .bill-section {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        width: 100%;
+      }
+      .action-buttons {
+        display: none;
+      }
+      .bill-items {
+        max-height: none;
+        overflow: visible;
+      }
+      .print-receipt {
+        font-family: 'Courier New', Courier, monospace;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .print-receipt-header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .print-date {
+        text-align: right;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Restaurant Billing System</h1>
-    </div>
-    
-    <div class="container">
-        <div class="menu-section">
-            <div class="menu-category">
-                <h2 class="category-title">Main Course</h2>
-                <div class="menu-grid">
-                    <div class="menu-item" onclick="addItem('Grilled Chicken', 175.99)">
-                        <img src="download.jpeg" alt="Grilled Chicken">
-                        <h4>Grilled Chicken</h4>
-                        <p>Rs175.99</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Pasta Alfredo', 125.99)">
-                        <img src="pastaAlfredo.jpeg" alt="Pasta Alfredo">
-                        <h4>Pasta Alfredo</h4>
-                        <p>Rs125.99</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Fish & Chips', 94.99)">
-                        <img src="Fish_and_chips.jpeg" alt="Fish & Chips">
-                        <h4>Fish & Chips</h4>
-                        <p>Rs94.99</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Beef Steak', 214.99)">
-                        <img src="beef_steak.jpeg" alt="Beef Steak">
-                        <h4>Beef Steak</h4>
-                        <p>Rs214.99</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="menu-category">
-                <h2 class="category-title">Appetizers</h2>
-                <div class="menu-grid">
-                    <div class="menu-item" onclick="addItem('Caesar Salad', 125.99)">
-                        <img src="cs.jpeg" alt="Caesar Salad">
-                        <h4>Caesar Salad</h4>
-                        <p>Rs125.99</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Garlic Bread', 149.99)">
-                        <img src="gb.jpeg" alt="Garlic Bread">
-                        <h4>Garlic Bread</h4>
-                        <p>Rs149.99</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Soup of the Day', 150.99)">
-                        <img src="soup.jpeg" alt="Soup">
-                        <h4>Soup of the Day</h4>
-                        <p>Rs150.99</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="menu-category">
-                <h2 class="category-title">Beverages</h2>
-                <div class="menu-grid">
-                    <div class="menu-item" onclick="addItem('Soft Drink', 90.00)">
-                        <img src="juice.jpeg" alt="Soft Drink">
-                        <h4>Soft Drink</h4>
-                        <p>Rs90.00</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Fresh Juice', 89.99)">
-                        <img src="fresh.jpeg" alt="Fresh Juice">
-                        <h4>Fresh Juice</h4>
-                        <p>Rs89.99</p>
-                    </div>
-                    <div class="menu-item" onclick="addItem('Coffee', 45.99)">
-                        <img src="cuff.jpeg" alt="Coffee">
-                        <h4>Coffee</h4>
-                        <p>Rs45.99</p>
-                    </div>
-                </div>
-            </div>
+  <div class="header">
+    <h1>Restaurant Billing System</h1>
+    <!-- Button to open the Add Menu Item modal -->
+    <button id="toggleAddItemBtn" onclick="toggleAddItemForm()">Add Menu Item</button>
+  </div>
+  <div class="container">
+    <!-- Left Column: Menu Section -->
+    <div class="menu-section" id="menuSection">
+      <!-- Example Menu Categories and Items -->
+      <div class="menu-category">
+        <h2 class="category-title">Main Course</h2>
+        <div class="menu-grid">
+          <div class="menu-item" onclick="addItem('Grilled Chicken', 175.99)">
+            <img src="{{ url_for('static', filename='download.jpeg') }}" alt="Grilled Chicken" />
+            <h4>Grilled Chicken</h4>
+            <p>Rs175.99</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Pasta Alfredo', 125.99)">
+            <img src="{{ url_for('static', filename='pastaAlfredo.jpeg') }}" alt="Pasta Alfredo" />
+            <h4>Pasta Alfredo</h4>
+            <p>Rs125.99</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Fish & Chips', 94.99)">
+            <img src="{{ url_for('static', filename='Fish_and_chips.jpeg') }}" alt="Fish & Chips" />
+            <h4>Fish & Chips</h4>
+            <p>Rs94.99</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Steak', 214.99)">
+            <img src="{{ url_for('static', filename='beef_steak.jpeg') }}" alt="Steak" />
+            <h4>Steak</h4>
+            <p>Rs214.99</p>
+          </div>
         </div>
-
-        <div class="bill-section">
-            <h2 class="bill-title">Current Bill</h2>
-            <div class="print-date" id="printDate"></div>
-            <div class="bill-items" id="billItems">
-                <!-- Bill items will be added here dynamically -->
-            </div>
-            <div class="bill-summary">
-                <div class="summary-row">
-                    <span>Subtotal:</span>
-                    <span id="subtotal">Rs0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Tax (10%):</span>
-                    <span id="tax">Rs0.00</span>
-                </div>
-                <div class="summary-row total-row">
-                    <span>Total:</span>
-                    <span id="total">Rs0.00</span>
-                </div>
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn print-btn" onclick="printBill()">Print Bill</button>
-                <button class="action-btn clear-btn" onclick="clearBill()">Clear Bill</button>
-            </div>
+      </div>
+      <div class="menu-category">
+        <h2 class="category-title">Appetizers</h2>
+        <div class="menu-grid">
+          <div class="menu-item" onclick="addItem('Caesar Salad', 125.99)">
+            <img src="{{ url_for('static', filename='cs.jpeg') }}" alt="Caesar Salad" />
+            <h4>Caesar Salad</h4>
+            <p>Rs125.99</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Garlic Bread', 149.99)">
+            <img src="{{ url_for('static', filename='gb.jpeg') }}" alt="Garlic Bread" />
+            <h4>Garlic Bread</h4>
+            <p>Rs149.99</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Soup of the Day', 150.99)">
+            <img src="{{ url_for('static', filename='soup.jpeg') }}" alt="Soup of the Day" />
+            <h4>Soup of the Day</h4>
+            <p>Rs150.99</p>
+          </div>
         </div>
+      </div>
+      <div class="menu-category">
+        <h2 class="category-title">Beverages</h2>
+        <div class="menu-grid">
+          <div class="menu-item" onclick="addItem('Soft Drink', 90.00)">
+            <img src="{{ url_for('static', filename='juice.jpeg') }}" alt="Soft Drink" />
+            <h4>Soft Drink</h4>
+            <p>Rs90.00</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Fresh Juice', 89.99)">
+            <img src="{{ url_for('static', filename='fresh.jpeg') }}" alt="Fresh Juice" />
+            <h4>Fresh Juice</h4>
+            <p>Rs89.99</p>
+          </div>
+          <div class="menu-item" onclick="addItem('Coffee', 45.99)">
+            <img src="{{ url_for('static', filename='cuff.jpeg') }}" alt="Coffee" />
+            <h4>Coffee</h4>
+            <p>Rs45.99</p>
+          </div>
+        </div>
+      </div>
     </div>
+    <!-- Right Column: Bill Section -->
+    <div class="bill-section">
+      <h2 class="bill-title">Current Bill</h2>
+      <div class="print-date" id="printDate"></div>
+      <div class="bill-items" id="billItems">
+        <!-- Bill items will be added here dynamically -->
+      </div>
+      <div class="bill-summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span id="subtotal">Rs0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax (10%):</span>
+          <span id="tax">Rs0.00</span>
+        </div>
+        <div class="summary-row total-row">
+          <span>Total:</span>
+          <span id="total">Rs0.00</span>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button class="action-btn submit-btn" onclick="submitOrder()">Submit Order</button>
+        <button class="action-btn print-btn" onclick="printBill()">Print Bill</button>
+        <button class="action-btn clear-btn" onclick="clearBill()">Clear Bill</button>
+      </div>
+    </div>
+  </div>
 
-    
+  <!-- Modal for adding new menu item -->
+  <div class="modal" id="addMenuModal">
+    <div class="modal-content">
+      <h2>Add New Menu Item</h2>
+      <input type="text" id="newItemName" placeholder="Item Name" required />
+      <input type="number" id="newItemPrice" placeholder="Price" step="0.01" required />
+      <input type="text" id="newItemImageUrl" placeholder="Image URL (optional)" />
+      <div>
+        <button class="save-btn" onclick="addNewMenuItem()">Save</button>
+        <button class="cancel-btn" onclick="toggleAddItemForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let billItems = {};
+
+    // Toggle the Add Menu Item modal
+    function toggleAddItemForm() {
+      const modal = document.getElementById("addMenuModal");
+      if (modal.style.display === "flex") {
+        modal.style.display = "none";
+      } else {
+        modal.style.display = "flex";
+      }
+    }
+
+    // Add a new menu item via the modal form
+    function addNewMenuItem() {
+      const name = document.getElementById("newItemName").value.trim();
+      const price = document.getElementById("newItemPrice").value;
+      const imageUrl = document.getElementById("newItemImageUrl").value.trim();
+
+      if (!name || !price) {
+        alert("Please fill out both the name and price.");
+        return;
+      }
+
+      const data = { name: name, price: price, image_url: imageUrl };
+
+      fetch("/api/menu", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.message) {
+            alert("New menu item added!");
+            // Clear form fields
+            document.getElementById("newItemName").value = "";
+            document.getElementById("newItemPrice").value = "";
+            document.getElementById("newItemImageUrl").value = "";
+            // Close modal
+            toggleAddItemForm();
+            // Optionally, refresh the menu display if loading dynamically
+          } else {
+            alert("Error adding menu item: " + result.error);
+          }
+        })
+        .catch(error => console.error("Error adding menu item:", error));
+    }
+
+    // Existing functions for bill management
+    function addItem(name, price) {
+      if (billItems[name]) {
+        updateQuantity(name, 1);
+      } else {
+        billItems[name] = { price: price, quantity: 1 };
+      }
+      updateBillDisplay();
+    }
+    function updateQuantity(name, change) {
+      if (billItems[name]) {
+        billItems[name].quantity += change;
+        if (billItems[name].quantity <= 0) {
+          delete billItems[name];
+        }
+        updateBillDisplay();
+      }
+    }
+    function updateBillDisplay() {
+      const billItemsDiv = document.getElementById('billItems');
+      billItemsDiv.innerHTML = '';
+      let subtotal = 0;
+      for (const [name, item] of Object.entries(billItems)) {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        const billItem = document.createElement('div');
+        billItem.className = 'bill-item';
+        billItem.innerHTML = `
+          <span>${name}</span>
+          <span>Rs${item.price.toFixed(2)}</span>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="updateQuantity('${name}', -1)">-</button>
+            <span>${item.quantity}</span>
+            <button class="quantity-btn" onclick="updateQuantity('${name}', 1)">+</button>
+          </div>
+          <span>Rs${itemTotal.toFixed(2)}</span>
+          <button class="remove-item" onclick="updateQuantity('${name}', -${item.quantity})">×</button>
+        `;
+        billItemsDiv.appendChild(billItem);
+      }
+      const tax = subtotal * 0.10;
+      const total = subtotal + tax;
+      document.getElementById('subtotal').textContent = `Rs${subtotal.toFixed(2)}`;
+      document.getElementById('tax').textContent = `Rs${tax.toFixed(2)}`;
+      document.getElementById('total').textContent = `Rs${total.toFixed(2)}`;
+    }
+    function clearBill() { billItems = {}; updateBillDisplay(); }
+    function printBill() {
+      const now = new Date();
+      document.getElementById('printDate').textContent = `Date: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+      document.body.classList.add('print-mode');
+      window.print();
+      document.body.classList.remove('print-mode');
+    }
+    function submitOrder() {
+      const customerName = prompt("Enter Customer Name:", "Guest");
+      const items = [];
+      for (const [name, item] of Object.entries(billItems)) {
+        items.push({ name: name, price: item.price, quantity: item.quantity });
+      }
+      const total = parseFloat(document.getElementById('total').textContent.replace("Rs", ""));
+      fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customer_name: customerName, items: items, total: total })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert("Order placed! Order ID: " + data.order_id);
+        clearBill();
+      })
+      .catch(error => console.error("Error placing order:", error));
+    }
+  </script>
 </body>
 </html>
- 
